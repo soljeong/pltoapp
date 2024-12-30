@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Django App</title>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script>
+        async function sendRequest(userInput) {
+            const response = await fetch('', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: new URLSearchParams({ 'user_input': userInput })
+            });
+            const data = await response.json();
+            document.getElementById('response').innerText = data.response;
+        }
+
+        async function submitInput(event) {
+            event.preventDefault();
+            const userInput = document.getElementById('user_input').value;
+            await sendRequest(userInput);
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log(`QR 코드 스캔 성공: ${decodedText}`);
+            sendRequest(decodedText);
+        }
+
+        function onScanFailure(error) {
+            document.getElementById("error-message").innerText = `QR error: ${error}`;
+            document.getElementById("error-message").style.display = "block";
+        }
+
+        window.onload = function () {
+        let html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", { fps: 30, qrbox: 300 });
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    };
+      </script>
+</head>
+<body>
+    <h1>Simple Django App</h1>
+    <form onsubmit="submitInput(event)">
+        {% csrf_token %}
+        <input type="text" id="user_input" name="user_input" placeholder="Type something...">
+        <button type="submit">Submit</button>
+    </form>
+    <p id="response"></p>
+
+    <div id="reader" style="width: 500px; height: 500px;"></div>
+    <p id="error-message" style="color: red; display: none;"></p>
+</body>
+</html>
