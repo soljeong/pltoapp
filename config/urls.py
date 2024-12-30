@@ -22,5 +22,7 @@ from . import views  # views.py 파일에서 뷰를 가져옵니다.
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),  # 루트 페이지 URL 패턴을 추가합니다.
+    path('result/', views.result, name='result'),  # 결과 페이지
+
 
 ]

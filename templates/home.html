@@ -1,31 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Simple Django App</title>
+    <meta charset="UTF-8">
+    <title>홈</title>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body>
+    <h1>홈페이지</h1>
+    <form action="/result/" method="post">
+        {% csrf_token %}
+        <label for="user_input">텍스트 입력:</label>
+        <input type="text" id="user_input" name="user_input">
+        <button type="submit">제출</button>
+    </form>
+
+    <div id="reader" style="width: 500px; height: 500px; margin-top: 20px;"></div>
+    <p id="error-message" style="color: red; display: none;"></p>
+
     <script>
-        async function sendRequest(userInput) {
-            const response = await fetch('', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: new URLSearchParams({ 'user_input': userInput })
-            });
-            const data = await response.json();
-            document.getElementById('response').innerText = data.response;
-        }
-
-        async function submitInput(event) {
-            event.preventDefault();
-            const userInput = document.getElementById('user_input').value;
-            await sendRequest(userInput);
-        }
-
         function onScanSuccess(decodedText, decodedResult) {
             console.log(`QR 코드 스캔 성공: ${decodedText}`);
-            sendRequest(decodedText);
+            // QR 코드 값을 폼의 텍스트 인풋에 자동 입력
+            document.getElementById("user_input").value = decodedText;
+            // 폼 자동 제출
+            document.querySelector("form").submit();
         }
 
         function onScanFailure(error) {
@@ -33,23 +31,9 @@
             document.getElementById("error-message").style.display = "block";
         }
 
-        window.onload = function () {
         let html5QrcodeScanner = new Html5QrcodeScanner(
             "reader", { fps: 30, qrbox: 300 });
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-    };
-      </script>
-</head>
-<body>
-    <h1>Simple Django App</h1>
-    <form onsubmit="submitInput(event)">
-        {% csrf_token %}
-        <input type="text" id="user_input" name="user_input" placeholder="Type something...">
-        <button type="submit">Submit</button>
-    </form>
-    <p id="response"></p>
-
-    <div id="reader" style="width: 500px; height: 500px;"></div>
-    <p id="error-message" style="color: red; display: none;"></p>
+    </script>
 </body>
 </html>
