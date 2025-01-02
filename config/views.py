@@ -84,12 +84,13 @@ def result(request):
 
     # API 호출
     order_data = get_order_list(API_KEY, token, user_input)
-    order_data = process_data(order_data)
+    order_table = process_data(order_data)
 
     
     if order_data:
         context = {
-            'response_message': f"조회 결과: {order_data}",
+            'response_message': f"조회 결과: {order_data['recordsTotalCount']} 건",
+            'order_table': order_table,
             'user_input': user_input,
         }
     else:
@@ -135,27 +136,26 @@ def fill_missing_values(results, results_prod):
         return results
 
 def process_data(order_list):
-    results, results_prod = json_to_dict(order_list)
-    
-    if results and results_prod:
-        results = fill_missing_values(results, results_prod)
-        
-        column_mapping = {
-            'sale_cnt': '주문수량',
-            'set_cd': 'SKU코드',
-            'set_name': 'SKU상품명',
-            'seller_nick': '별칭',
-            'invoice_send_time': '송장전송일',
-            'shop_ord_no': '주문번호'
-        }
-        
-        selected_data = []
-        for item in results:
-            selected_item = {column_mapping[key]: item[key] for key in column_mapping if key in item}
-            selected_data.append(selected_item)
-        
-        return [{'SKU코드': item['SKU코드'], 'SKU상품명': item['SKU상품명']} for item in selected_data]
-    
-    return []
+
+    # results와 results_prod 배열 추출
+    results = order_list.get('results', [])
+    results_prod = order_list.get('results_prod', [])
+
+    # uniq 필드를 키로 사용하여 results를 딕셔너리로 변환
+    results_dict = {item['uniq']: item for item in results}
+
+    # 조인된 데이터를 저장할 리스트
+    joined_data = []
+
+    # results_prod의 각 항목에 대해 results와 조인
+    for prod in results_prod:
+        uniq = prod.get('uniq')
+        if uniq in results_dict:
+            joined_item = {**results_dict[uniq], **prod}
+            joined_data.append(joined_item)
+
+    # 필요한 필드만 추출하여 리스트로 변환
+    return [(item['shop_sale_name'], item['sku_cd'], item['stock_cd'], item['stock_cnt_real']) for item in joined_data]
+
 
 

@@ -7,6 +7,28 @@
 <body>
     <h1>결과 페이지</h1>
     <p>{{ response_message }}</p>
+    <p>송장 번호 : {{ user_input }}</p>
     <a href="/">홈으로 돌아가기</a>
+    <table>
+        <thead>
+            <tr>
+                <th>상품명</th>
+                <th>SKU</th>
+                <th>재고코드</th>
+                <th>실재고수량</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order_table %}
+            <tr>
+                <td>{{ item.0 }}</td>
+                <td>{{ item.1 }}</td>
+                <td>{{ item.2 }}</td>
+                <td>{{ item.3 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
 </body>
 </html>
