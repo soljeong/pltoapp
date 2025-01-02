@@ -4,6 +4,16 @@ from django.core.cache import cache
 from django.http import HttpResponse
 import requests
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # .env 파일 로드
+
+API_KEY = os.getenv('PLTO_API_KEY')
+EMAIL = os.getenv('PLTO_ID')
+PASSWORD = os.getenv('PLTO_PW')
+
+
 BASE_URL = "https://openapi.playauto.io/api"
 
 
@@ -62,10 +72,7 @@ def result(request):
 
     # 캐시에 토큰이 없으면 새로 발급받음
     if not token:
-        # 기본 설정
-        API_KEY = "UqLoZBwTh28ALIOtqpA9D79bBhcBIIEc2Is0pLql"  # 승인받은 API 키
-        EMAIL = "soljeong@kakao.com"  # API 계정 이메일
-        PASSWORD = "cfbF57@GsZ@MpHB"  # API 계정 비밀번호
+
 
         token = get_token(API_KEY, EMAIL, PASSWORD)
 
