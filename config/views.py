@@ -9,9 +9,13 @@ import os
 
 load_dotenv()  # .env 파일 로드
 
+# 환경 변수에서 API 키, 이메일, 비밀번호 가져오기
 API_KEY = os.getenv('PLTO_API_KEY')
 EMAIL = os.getenv('PLTO_ID')
 PASSWORD = os.getenv('PLTO_PW')
+
+if not API_KEY or not EMAIL or not PASSWORD:
+    raise ValueError("API_KEY, EMAIL, and PASSWORD must be set in the environment variables.")
 
 
 BASE_URL = "https://openapi.playauto.io/api"
